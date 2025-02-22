@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth_demo/screens/home_screen.dart';
 import 'package:firebase_auth_demo/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -52,11 +53,14 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Welcome back, ${userCredential.user?.email}'),
-              backgroundColor: Colors.green,
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => HomeScreen.withAuth(
+                widget.auth,
+                userCredential.user!,
+              ),
             ),
+            (route) => false,
           );
         }
       } on FirebaseAuthException catch (e) {

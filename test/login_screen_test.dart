@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth_demo/screens/home_screen.dart';
 import 'package:firebase_auth_demo/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,15 +11,19 @@ class MockUserCredential extends Mock implements UserCredential {}
 
 class MockUser extends Mock implements User {}
 
+class MockNavigatorObserver extends Mock implements NavigatorObserver {}
+
 void main() {
   late MockFirebaseAuth mockFirebaseAuth;
   late MockUserCredential mockUserCredential;
   late MockUser mockUser;
+  late MockNavigatorObserver mockNavigatorObserver;
 
   setUp(() {
     mockFirebaseAuth = MockFirebaseAuth();
     mockUserCredential = MockUserCredential();
     mockUser = MockUser();
+    mockNavigatorObserver = MockNavigatorObserver();
 
     // Set up default mock responses
     when(() => mockUserCredential.user).thenReturn(mockUser);
@@ -28,6 +33,7 @@ void main() {
   Widget createLoginScreen() {
     return MaterialApp(
       home: LoginScreen.withAuth(mockFirebaseAuth),
+      navigatorObservers: [mockNavigatorObserver],
     );
   }
 
@@ -91,7 +97,8 @@ void main() {
     expect(find.text('Password must be at least 6 characters'), findsOneWidget);
   });
 
-  testWidgets('Successful login attempt', (WidgetTester tester) async {
+  testWidgets('Successful login navigates to home screen',
+      (WidgetTester tester) async {
     when(() => mockFirebaseAuth.signInWithEmailAndPassword(
           email: any(named: 'email'),
           password: any(named: 'password'),
@@ -115,8 +122,9 @@ void main() {
           password: 'password123',
         )).called(1);
 
-    // Verify success message
-    expect(find.text('Welcome back, test@example.com'), findsOneWidget);
+    // Verify navigation to home screen
+    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.text('Welcome test@example.com!'), findsOneWidget);
   });
 
   testWidgets('Failed login attempt shows error message',
