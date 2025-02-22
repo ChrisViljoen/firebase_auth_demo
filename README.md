@@ -49,7 +49,14 @@ A Flutter application demonstrating Firebase Authentication with Riverpod state 
 2. Enable Email/Password Authentication:
    - In Firebase Console, go to Authentication > Sign-in method
    - Enable Email/Password sign-in
-3. Install required CLI tools:
+3. Add your Android and iOS apps to your Firebase project:
+   - Choose your app identifiers (e.g. `com.example.firebaseauthdemo` - note this down for later)
+   - Update your app's package name/bundle ID to match:
+     - Android: Change `applicationId` in `android/app/build.gradle`
+     - iOS: Update bundle identifier in Xcode project settings
+   - Register these same identifiers in Firebase Console
+   - Follow the Firebase Console setup wizard for each platform
+4. Install required CLI tools:
    ```bash
    # Install Firebase CLI if not already installed
    npm install -g firebase-tools
@@ -60,7 +67,7 @@ A Flutter application demonstrating Firebase Authentication with Riverpod state 
    # Add pub cache to PATH (add to your shell config file for persistence)
    export PATH="$PATH":"$HOME/.pub-cache/bin"
    ```
-4. Generate Firebase configuration:
+5. Generate Firebase configuration:
    ```bash
    # Login to Firebase (if not already logged in)
    firebase login
@@ -70,12 +77,13 @@ A Flutter application demonstrating Firebase Authentication with Riverpod state 
    ```
    - Select your Firebase project from the list
    - Choose the platforms you want to support (Android/iOS)
+   - When prompted, use the same package name/bundle ID you chose in step 3
    - This will generate `lib/firebase_options.dart`
-5. Add your platform-specific configuration files:
-   - For Android: Place `google-services.json` in `android/app/`
-   - For iOS: Place `GoogleService-Info.plist` in `ios/Runner/`
+6. Download and place your platform-specific configuration files:
+   - For Android: Download `google-services.json` from Firebase Console and place in `android/app/`
+   - For iOS: Download `GoogleService-Info.plist` from Firebase Console and place in `ios/Runner/`
    
-Note: The `firebase_options.dart` file contains your Firebase project configuration and is required for the app to connect to Firebase. The platform-specific configuration files can be downloaded from the Firebase Console after registering your apps.
+Note: The `firebase_options.dart` file contains your Firebase project configuration and is required for the app to connect to Firebase. Make sure the package name/bundle ID matches exactly between your Flutter project configuration, Firebase Console, and platform-specific settings.
 
 ### Installation
 
@@ -84,11 +92,15 @@ Note: The `firebase_options.dart` file contains your Firebase project configurat
 git clone https://github.com/ChrisViljoen/firebase_auth_demo.git
 cd firebase_auth_demo
 ```
-2. Install dependencies:
+2. Create the Flutter project:
+```bash
+flutter create . --platforms=android,ios --org=com.example.firebaseauthdemo
+```
+3. Install dependencies:
 ```bash
 flutter pub get
 ```
-3. Generate necessary files:
+4. Generate necessary files:
 ```bash
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
