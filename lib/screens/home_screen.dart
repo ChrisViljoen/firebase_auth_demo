@@ -1,58 +1,30 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth_demo/screens/login_screen.dart';
+import 'package:firebase_auth_demo/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatelessWidget {
-  final FirebaseAuth auth;
-  final User user;
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
 
-  const HomeScreen._({
-    super.key,
-    required this.auth,
-    required this.user,
-  });
-
-  factory HomeScreen({Key? key}) {
-    final auth = FirebaseAuth.instance;
-    final user = auth.currentUser;
-    if (user == null) throw Exception('No user logged in');
-    return HomeScreen._(key: key, auth: auth, user: user);
-  }
-
-  static HomeScreen withAuth(FirebaseAuth auth, User user, {Key? key}) {
-    return HomeScreen._(key: key, auth: auth, user: user);
-  }
-
-  Future<void> _handleLogout(BuildContext context) async {
+  Future<void> _handleLogout(WidgetRef ref) async {
     try {
-      await auth.signOut();
-      if (context.mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => LoginScreen.withAuth(auth)),
-          (route) => false,
-        );
-      }
+      await ref.read(authProvider.notifier).signOut();
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error logging out. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      debugPrint('Error during logout: $e');
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authProvider).value;
+    if (user == null) return const SizedBox.shrink();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => _handleLogout(context),
+            onPressed: () => _handleLogout(ref),
             tooltip: 'Logout',
           ),
         ],

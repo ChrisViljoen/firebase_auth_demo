@@ -30,6 +30,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+*.g.dart
+*.freezed.dart
 
 # Symbolication related
 app.*.symbols
@@ -48,6 +50,7 @@ GoogleService-Info.plist
 firebase_options.dart
 .firebase/
 firebase-debug.log
+firebase.json
 
 # VS Code configuration
 .vscode/
@@ -61,5 +64,16 @@ ios/Podfile.lock
 ios/Runner.xcworkspace/
 ios/Runner.xcodeproj/project.xcworkspace/
 ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcodeproj/project.pbxproj
+ios/Runner.xcworkspace/contents.xcworkspacedata
+
+# macOS specific files
+macos/Podfile.lock
+macos/Runner.xcworkspace/
+macos/Runner.xcodeproj/project.xcworkspace/
+macos/Runner.xcodeproj/xcuserdata/
+macos/Runner.xcodeproj/project.pbxproj
+macos/Runner.xcworkspace/contents.xcworkspacedata
+
 android/.gradle/
 android/local.properties

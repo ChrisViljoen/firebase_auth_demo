@@ -1,14 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth_demo/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -32,16 +34,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
 
       try {
-        final userCredential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+        await ref.read(authProvider.notifier).signUp(
+              _emailController.text.trim(),
+              _passwordController.text.trim(),
+            );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Welcome ${userCredential.user?.email}'),
+            const SnackBar(
+              content: Text('Registration successful! Welcome to the app.'),
               backgroundColor: Colors.green,
             ),
           );
@@ -69,8 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 'Authentication service not properly configured. Please check Firebase setup.';
             break;
           default:
-            errorMessage =
-                'An error occurred during registration: ${e.message}';
+            errorMessage = 'An error occurred during registration: ${e.message}';
         }
 
         setState(() {

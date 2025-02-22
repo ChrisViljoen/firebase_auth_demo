@@ -1,31 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth_demo/screens/home_screen.dart';
+import 'package:firebase_auth_demo/providers/auth_provider.dart';
 import 'package:firebase_auth_demo/screens/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginScreen extends StatefulWidget {
-  final FirebaseAuth auth;
-
-  const LoginScreen._({
-    super.key,
-    required this.auth,
-  });
-
-  factory LoginScreen({Key? key}) = _DefaultLoginScreen;
-
-  static LoginScreen withAuth(FirebaseAuth auth, {Key? key}) {
-    return LoginScreen._(key: key, auth: auth);
-  }
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _DefaultLoginScreen extends LoginScreen {
-  _DefaultLoginScreen({super.key}) : super._(auth: FirebaseAuth.instance);
-}
-
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -47,22 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        final userCredential = await widget.auth.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-
-        if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => HomeScreen.withAuth(
-                widget.auth,
-                userCredential.user!,
-              ),
-            ),
-            (route) => false,
-          );
-        }
+        await ref.read(authProvider.notifier).signIn(
+              _emailController.text.trim(),
+              _passwordController.text.trim(),
+            );
       } on FirebaseAuthException catch (e) {
         String errorMessage;
         switch (e.code) {

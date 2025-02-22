@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth_demo/screens/home_screen.dart';
+import 'package:firebase_auth_demo/providers/auth_provider.dart';
 import 'package:firebase_auth_demo/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 
@@ -11,19 +12,15 @@ class MockUserCredential extends Mock implements UserCredential {}
 
 class MockUser extends Mock implements User {}
 
-class MockNavigatorObserver extends Mock implements NavigatorObserver {}
-
 void main() {
   late MockFirebaseAuth mockFirebaseAuth;
   late MockUserCredential mockUserCredential;
   late MockUser mockUser;
-  late MockNavigatorObserver mockNavigatorObserver;
 
   setUp(() {
     mockFirebaseAuth = MockFirebaseAuth();
     mockUserCredential = MockUserCredential();
     mockUser = MockUser();
-    mockNavigatorObserver = MockNavigatorObserver();
 
     // Set up default mock responses
     when(() => mockUserCredential.user).thenReturn(mockUser);
@@ -31,9 +28,19 @@ void main() {
   });
 
   Widget createLoginScreen() {
-    return MaterialApp(
-      home: LoginScreen.withAuth(mockFirebaseAuth),
-      navigatorObservers: [mockNavigatorObserver],
+    final container = ProviderContainer(
+      overrides: [
+        firebaseAuthProvider.overrideWithValue(mockFirebaseAuth),
+      ],
+    );
+
+    addTearDown(container.dispose);
+
+    return UncontrolledProviderScope(
+      container: container,
+      child: const MaterialApp(
+        home: LoginScreen(),
+      ),
     );
   }
 
@@ -97,12 +104,15 @@ void main() {
     expect(find.text('Password must be at least 6 characters'), findsOneWidget);
   });
 
-  testWidgets('Successful login navigates to home screen',
+  testWidgets('Successful login updates auth state',
       (WidgetTester tester) async {
     when(() => mockFirebaseAuth.signInWithEmailAndPassword(
           email: any(named: 'email'),
           password: any(named: 'password'),
         )).thenAnswer((_) async => mockUserCredential);
+
+    when(() => mockFirebaseAuth.authStateChanges())
+        .thenAnswer((_) => Stream.value(mockUser));
 
     await tester.pumpWidget(createLoginScreen());
 
@@ -121,10 +131,6 @@ void main() {
           email: 'test@example.com',
           password: 'password123',
         )).called(1);
-
-    // Verify navigation to home screen
-    expect(find.byType(HomeScreen), findsOneWidget);
-    expect(find.text('Welcome test@example.com!'), findsOneWidget);
   });
 
   testWidgets('Failed login attempt shows error message',
