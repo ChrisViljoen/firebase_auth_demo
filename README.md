@@ -49,17 +49,33 @@ A Flutter application demonstrating Firebase Authentication with Riverpod state 
 2. Enable Email/Password Authentication:
    - In Firebase Console, go to Authentication > Sign-in method
    - Enable Email/Password sign-in
-3. Add your own Android and iOS apps to your Firebase project:
-   - Update the app's package name/bundle ID:
-     - Android: Change `applicationId` in `android/app/build.gradle`
-     - iOS: Update bundle identifier in Xcode project settings
-   - Register these same identifiers in Firebase Console
-   - Follow the Firebase Console setup wizard for each platform
-4. Download your own configuration files:
-   - For Android: `google-services.json` (place in `android/app/`)
-   - For iOS: `GoogleService-Info.plist` (place in `ios/Runner/`)
-
-Note: You must use your own Firebase configuration files. The demo app's configuration files are not included in source control for security reasons, and you'll need to set up your own Firebase project to run the app.
+3. Install required CLI tools:
+   ```bash
+   # Install Firebase CLI if not already installed
+   npm install -g firebase-tools
+   
+   # Install FlutterFire CLI
+   dart pub global activate flutterfire_cli
+   
+   # Add pub cache to PATH (add to your shell config file for persistence)
+   export PATH="$PATH":"$HOME/.pub-cache/bin"
+   ```
+4. Generate Firebase configuration:
+   ```bash
+   # Login to Firebase (if not already logged in)
+   firebase login
+   
+   # Generate firebase_options.dart and configure platforms
+   flutterfire configure
+   ```
+   - Select your Firebase project from the list
+   - Choose the platforms you want to support (Android/iOS)
+   - This will generate `lib/firebase_options.dart`
+5. Add your platform-specific configuration files:
+   - For Android: Place `google-services.json` in `android/app/`
+   - For iOS: Place `GoogleService-Info.plist` in `ios/Runner/`
+   
+Note: The `firebase_options.dart` file contains your Firebase project configuration and is required for the app to connect to Firebase. The platform-specific configuration files can be downloaded from the Firebase Console after registering your apps.
 
 ### Installation
 
