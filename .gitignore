@@ -41,3 +41,25 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase configuration files
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+.firebase/
+firebase-debug.log
+
+# VS Code configuration
+.vscode/
+
+# Environment files
+.env
+.env.*
+
+# Platform specific files that should be generated locally
+ios/Podfile.lock
+ios/Runner.xcworkspace/
+ios/Runner.xcodeproj/project.xcworkspace/
+ios/Runner.xcodeproj/xcuserdata/
+android/.gradle/
+android/local.properties
